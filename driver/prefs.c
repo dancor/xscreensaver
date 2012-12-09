@@ -251,6 +251,7 @@ static const char * const prefs[] = {
   "lockVTs",			/* not saved */
   "lockTimeout",
   "passwdTimeout",
+  "alternatePasswd",
   "visualID",
   "installColormap",
   "verbose",
@@ -784,6 +785,7 @@ write_init_file (Display *dpy,
       CHECK("lockVTs")		continue;  /* don't save, unused */
       CHECK("lockTimeout")	type = pref_time, t = p->lock_timeout;
       CHECK("passwdTimeout")	type = pref_time, t = p->passwd_timeout;
+      CHECK("alternatePasswd")	type = pref_str,  s = p->alternate_passwd;
       CHECK("visualID")		type = pref_str,  s =    visual_name;
       CHECK("installColormap")	type = pref_bool, b = p->install_cmap_p;
       CHECK("verbose")		type = pref_bool, b = p->verbose_p;
@@ -1068,6 +1070,9 @@ load_init_file (Display *dpy, saver_preferences *p)
   p->lock_timeout    = 1000 * get_minutes_resource (dpy, "lockTimeout", "Time");
   p->cycle           = 1000 * get_minutes_resource (dpy, "cycle", "Time");
   p->passwd_timeout  = 1000 * get_seconds_resource (dpy, "passwdTimeout", "Time");
+  p->alternate_passwd = get_string_resource (dpy,
+                                             "alternatePasswd",
+                                             "AlternatePasswd");
   p->pointer_timeout = 1000 * get_seconds_resource (dpy, "pointerPollTime", "Time");
   p->pointer_hysteresis = get_integer_resource (dpy, "pointerHysteresis","Integer");
   p->notice_events_timeout = 1000*get_seconds_resource(dpy,

@@ -126,6 +126,7 @@ struct saver_preferences {
   Time lock_timeout;		/* how long after activation locking starts */
   Time cycle;			/* how long each hack should run */
   Time passwd_timeout;		/* how much time before pw dialog goes down */
+  char *alternate_passwd;	/* an alternate password to unlock */
   Time pointer_timeout;		/* how often to check mouse position */
   Time notice_events_timeout;	/* how long after window creation to select */
   Time watchdog_timeout;	/* how often to re-raise and re-blank screen */

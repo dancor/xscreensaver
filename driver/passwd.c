@@ -86,12 +86,50 @@ Bool lock_priv_init (int argc, char **argv, Bool verbose_p);
 Bool lock_init (int argc, char **argv, Bool verbose_p);
 Bool passwd_valid_p (const char *typed_passwd, Bool verbose_p);
 
+
+static void
+try_unlock_alternate(saver_info *si,
+		    Bool verbose_p,
+		    Bool (*valid_p)(const char *typed_passwd, Bool verbose_p))
+{
+  struct auth_message message;
+  struct auth_response *response = NULL;
+
+  memset(&message, 0, sizeof(message));
+
+  /* Call the auth_conv function with "Password:", then check the result.
+   */
+  message.type = AUTH_MSGTYPE_PROMPT_NOECHO;
+  message.msg = "Password:";
+
+  si->unlock_cb(1, &message, &response, si);
+
+  if (!response)
+    return;
+
+  if (*si->prefs.alternate_passwd &&
+      0 == strcmp(response->response, si->prefs.alternate_passwd))
+    si->unlock_state = ul_success;	       /* yay */
+  else if (si->unlock_state == ul_cancel ||
+           si->unlock_state == ul_time)
+    ;					       /* more specific failures ok */
+  else
+    si->unlock_state = ul_fail;		       /* generic failure */
+
+  if (response->response)
+    free(response->response);
+  free(response);
+}
+
+
 /* The authorization methods to try, in order.
    Note that the last one (the pwent version) is actually two auth methods,
    since that code tries shadow passwords, and then non-shadow passwords.
    (It's all in the same file since the APIs are randomly nearly-identical.)
  */
 struct auth_methods methods[] = {
+  { "alternate",        0, 0, 0, try_unlock_alternate,
+                        False, False },
 # ifdef HAVE_PAM
   { "PAM",              0, pam_priv_init, 0, pam_try_unlock,
                         False, False },
@@ -107,7 +145,6 @@ struct auth_methods methods[] = {
   { "normal",           pwent_lock_init, pwent_priv_init, pwent_passwd_valid_p, 0,
                         False, False }
 };
-
 
 Bool
 lock_priv_init (int argc, char **argv, Bool verbose_p)
