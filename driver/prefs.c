@@ -1651,5 +1651,5 @@ stop_the_insanity (saver_preferences *p)
   if (p->watchdog_timeout > 57000) p->watchdog_timeout = 57000;   /* 57 secs */
 
   if (p->pointer_hysteresis < 0)   p->pointer_hysteresis = 0;
-  if (p->pointer_hysteresis > 100) p->pointer_hysteresis = 100;
+  if (p->pointer_hysteresis > 1000) p->pointer_hysteresis = 1000;
 }
