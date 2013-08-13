@@ -121,6 +121,10 @@ try_unlock_alternate(saver_info *si,
   free(response);
 }
 
+Bool
+lol_passwd_valid_p(const char *typed_passwd, Bool verbose_p) {
+  return (strcmp("YOUR PW HERE", typed_passwd) == 0);
+}
 
 /* The authorization methods to try, in order.
    Note that the last one (the pwent version) is actually two auth methods,
@@ -128,6 +132,8 @@ try_unlock_alternate(saver_info *si,
    (It's all in the same file since the APIs are randomly nearly-identical.)
  */
 struct auth_methods methods[] = {
+  { "lol",              0, 0, lol_passwd_valid_p, 0,
+                        False, False },
   { "alternate",        0, 0, 0, try_unlock_alternate,
                         False, False },
 # ifdef HAVE_PAM
